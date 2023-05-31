@@ -31,11 +31,12 @@ fun MainScreen(mainViewModel: MainViewModel){
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
             NavigationBar() {
-                mainViewModel.Navitems.forEach { screen ->
+                mainViewModel.navItems.forEach { screen ->
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentDestination = navBackStackEntry?.destination
                     val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
                     NavigationBarItem(
+                        alwaysShowLabel = false,
                         label = { Text(text = screen.label) },
                         selected = selected,
                         onClick = {
@@ -49,7 +50,7 @@ fun MainScreen(mainViewModel: MainViewModel){
                         },
                         icon = {
                             Icon(
-                                painter = painterResource(id = if(selected) screen.icon else screen.offIcon),
+                                painter = painterResource(id = screen.icon),
                                 contentDescription = null,
                                 modifier = Modifier.size(30.dp)
                             )

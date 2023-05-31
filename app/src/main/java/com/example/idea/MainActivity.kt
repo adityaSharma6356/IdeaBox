@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
                         mainViewModel.loginSuccess = true
                     }
 
-                    NavHost(navController = navController, startDestination = "login"){
+                    NavHost(navController = navController, startDestination = "main"){
                         navigation(
                             startDestination = "login_or_register",
                             route = "login"
@@ -101,15 +101,15 @@ class MainActivity : ComponentActivity() {
                                         }
                                     }
                                 )
-                                LaunchedEffect(key1 = mainViewModel.user){
-                                    if(mainViewModel.loginSuccess){
-                                        navController.navigate("main"){
-                                            popUpTo("login") {
-                                                inclusive = true
-                                            }
-                                        }
-                                    }
-                                }
+//                                LaunchedEffect(key1 = mainViewModel.user){
+//                                    if(mainViewModel.loginSuccess){
+//                                        navController.navigate("main"){
+//                                            popUpTo("login") {
+//                                                inclusive = true
+//                                            }
+//                                        }
+//                                    }
+//                                }
                                 Box(contentAlignment = Alignment.Center, modifier = Modifier
                                     .fillMaxSize()) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -123,11 +123,6 @@ class MainActivity : ComponentActivity() {
                                                     launcher
                                                 )
                                                 logginIn = true
-//                                                navController.navigate("main"){
-//                                                    popUpTo("login") {
-//                                                        inclusive = true
-//                                                    }
-//                                                }
                                             }
                                             .background(
                                                 if (darkTheme) Color(
