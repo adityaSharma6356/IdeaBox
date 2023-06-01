@@ -1,10 +1,15 @@
 package com.example.idea.presentation
 
 
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.IntentSenderRequest
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -15,22 +20,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.idea.presentation.google.GoogleAuthUIClient
 import com.example.idea.util.Screen
 
+
 @Composable
-fun MainScreen(mainViewModel: MainViewModel){
+fun MainScreen(
+    mainViewModel: MainViewModel,
+    mainNavController: NavController,
+    googleAuthUiClient: GoogleAuthUIClient
+){
     val navController = rememberNavController()
     Scaffold(
+        topBar = {
+            IdeaBoxScreen(mainViewModel)
+        },
         containerColor = Color.Transparent,
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            NavigationBar() {
+            NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
                 mainViewModel.navItems.forEach { screen ->
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentDestination = navBackStackEntry?.destination
@@ -50,7 +65,7 @@ fun MainScreen(mainViewModel: MainViewModel){
                         },
                         icon = {
                             Icon(
-                                painter = painterResource(id = screen.icon),
+                                painter = painterResource(id = if(selected) screen.icon else screen.offIcon),
                                 contentDescription = null,
                                 modifier = Modifier.size(30.dp)
                             )
@@ -60,9 +75,12 @@ fun MainScreen(mainViewModel: MainViewModel){
             }
                     },
         content = { innerPadding ->
+            if(mainViewModel.showProfileSection){
+                ProfileAlertBox(mainViewModel, innerPadding, mainNavController, googleAuthUiClient)
+            }
             NavHost(navController = navController, startDestination = Screen.Idea.route, modifier = Modifier.padding(innerPadding)){
                 composable(Screen.Idea.route){
-                    IdeaBoxScreen(mainViewModel)
+                    MyIdeasScreen(mainViewModel)
                 }
                 composable(Screen.MyIdea.route){
                     MyIdeasScreen(mainViewModel)

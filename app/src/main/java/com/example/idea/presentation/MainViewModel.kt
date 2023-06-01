@@ -23,6 +23,7 @@ class MainViewModel: ViewModel() {
     var user by mutableStateOf(User())
     var loginSuccess by mutableStateOf(false)
     var searchResult = mutableStateMapOf<String, List<String>>()
+    var showProfileSection by mutableStateOf(false)
     var searchSuggestions = mutableStateListOf<String>()
     val navItems = listOf(
         Screen.Idea,
@@ -30,11 +31,9 @@ class MainViewModel: ViewModel() {
         Screen.Profile
     )
     var trendingTopic = listOf(
-        "Artificial Intelligence (AI)",
         "Mobile App Development",
         "Web Development",
         "Fitness and Exercise",
-        "Nutrition and Diet",
         "Education",
         "Language Learning",
         "Music and Audio",
@@ -63,6 +62,16 @@ class MainViewModel: ViewModel() {
                     signInIntentSender ?: return@launch
                 ).build()
             )
+        }
+    }
+
+    fun logout(
+        googleAuthUIClient: GoogleAuthUIClient
+    ){
+        viewModelScope.launch {
+            googleAuthUIClient.signOut()
+            user = User()
+            showProfileSection = false
         }
     }
 }

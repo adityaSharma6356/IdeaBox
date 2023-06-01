@@ -1,10 +1,12 @@
 package com.example.idea
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,7 +23,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,6 +57,7 @@ class MainActivity : ComponentActivity() {
             oneTapClient = Identity.getSignInClient(applicationContext)
         )
     }
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -73,6 +75,25 @@ class MainActivity : ComponentActivity() {
                         mainViewModel.user = data
                         mainViewModel.loginSuccess = true
                     }
+                    val launcher = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.StartIntentSenderForResult(),
+                        onResult = { result ->
+                            logginIn = false
+                            if(result.resultCode == RESULT_OK) {
+                                lifecycleScope.launch {
+                                    val signInResult = googleAuthUiClient.signInWithIntent(
+                                        intent = result.data ?: return@launch
+                                    )
+                                    mainViewModel.user = signInResult.data ?: User()
+                                    navController.navigate("main"){
+                                        popUpTo("login") {
+                                            inclusive = true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    )
 
                     NavHost(navController = navController, startDestination = "main"){
                         navigation(
@@ -82,34 +103,6 @@ class MainActivity : ComponentActivity() {
                             composable(route = "login_or_register"){
                                 val darkTheme = isSystemInDarkTheme()
                                 var icon = if(darkTheme) R.drawable.btn_google_dark_normal_xhdpi else R.drawable.btn_google_light_normal_xhdpi
-                                val launcher = rememberLauncherForActivityResult(
-                                    contract = ActivityResultContracts.StartIntentSenderForResult(),
-                                    onResult = { result ->
-                                        logginIn = false
-                                        if(result.resultCode == RESULT_OK) {
-                                            lifecycleScope.launch {
-                                                val signInResult = googleAuthUiClient.signInWithIntent(
-                                                    intent = result.data ?: return@launch
-                                                )
-                                                mainViewModel.user = signInResult.data ?: User()
-                                                navController.navigate("main"){
-                                                    popUpTo("login") {
-                                                        inclusive = true
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                )
-//                                LaunchedEffect(key1 = mainViewModel.user){
-//                                    if(mainViewModel.loginSuccess){
-//                                        navController.navigate("main"){
-//                                            popUpTo("login") {
-//                                                inclusive = true
-//                                            }
-//                                        }
-//                                    }
-//                                }
                                 Box(contentAlignment = Alignment.Center, modifier = Modifier
                                     .fillMaxSize()) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -149,7 +142,7 @@ class MainActivity : ComponentActivity() {
                         }
                         navigation(startDestination = "main_idea",route = "main"){
                             composable(route = "main_idea"){
-                                MainScreen(mainViewModel)
+                                MainScreen(mainViewModel, navController, googleAuthUiClient)
                             }
                         }
                     }
