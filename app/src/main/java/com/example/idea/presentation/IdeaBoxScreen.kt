@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -73,7 +74,9 @@ fun IdeaBoxScreen(mainViewModel: MainViewModel) {
                                 }
                         )
                     } else {
-                        Icon(painter = painterResource(id = R.drawable.profile), contentDescription = "", modifier = Modifier.size(25.dp).clickable { mainViewModel.showProfileSection = true })
+                        Icon(painter = painterResource(id = R.drawable.profile), contentDescription = "", modifier = Modifier
+                            .size(25.dp)
+                            .clickable { mainViewModel.showProfileSection = true })
                     }
                 }
             },
@@ -86,6 +89,7 @@ fun IdeaBoxScreen(mainViewModel: MainViewModel) {
             {
                 query = it
                 mainViewModel.loadSuggestions(query)
+                mainViewModel.getProjectsByName(query)
             },
             onSearch = {
 
@@ -117,11 +121,31 @@ fun IdeaBoxScreen(mainViewModel: MainViewModel) {
                         }
                     }
                 } else {
-                    LazyColumn(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
-                        items(mainViewModel.searchSuggestions.size){ index ->
-                            Text(text = mainViewModel.searchSuggestions[index], fontSize = 16.sp, maxLines = 1, modifier = Modifier
-                                .padding(start = 0.dp, top = 25.dp)
-                                .fillMaxWidth(0.8f))
+                    if(mainViewModel.searchSuggestions.isNotEmpty()){
+                        Text(text = "Topics", fontSize = 18.sp, modifier = Modifier.padding(start = 20.dp, top = 5.dp, bottom = 0.dp))
+                        LazyColumn(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
+                            items(mainViewModel.searchSuggestions.size){ index ->
+                                Text(text = mainViewModel.searchSuggestions[index], fontSize = 16.sp, maxLines = 1, modifier = Modifier
+                                    .padding(start = 0.dp, top = 25.dp)
+                                    .fillMaxWidth(0.8f))
+                            }
+                        }
+                    }
+                    if(mainViewModel.searchResult.isNotEmpty()){
+                        Spacer(
+                            modifier = Modifier
+                                .padding(top = 15.dp, bottom = 10.dp)
+                                .fillMaxWidth()
+                                .height((0.5).dp)
+                                .background(MaterialTheme.colorScheme.onSurface)
+                        )
+                        Text(text = "Projects", fontSize = 18.sp, modifier = Modifier.padding(start = 20.dp, top = 5.dp, bottom = 0.dp))
+                        LazyColumn(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
+                            items(mainViewModel.searchResult.size){ index ->
+                                Text(text = mainViewModel.searchResult[index].name, fontSize = 16.sp, maxLines = 1, modifier = Modifier
+                                    .padding(start = 0.dp, top = 25.dp)
+                                    .fillMaxWidth(0.8f))
+                            }
                         }
                     }
                 }

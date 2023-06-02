@@ -12,6 +12,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.idea.data.repositories.DataRepositoryImpl
+import com.example.idea.domain.models.ProjectIdea
 import com.example.idea.domain.models.User
 import com.example.idea.presentation.google.GoogleAuthUIClient
 import com.example.idea.util.Screen
@@ -22,7 +23,7 @@ import kotlinx.coroutines.launch
 class MainViewModel: ViewModel() {
     var user by mutableStateOf(User())
     var loginSuccess by mutableStateOf(false)
-    var searchResult = mutableStateMapOf<String, List<String>>()
+    var searchResult = mutableStateListOf<ProjectIdea>()
     var showProfileSection by mutableStateOf(false)
     var searchSuggestions = mutableStateListOf<String>()
     val navItems = listOf(
@@ -48,6 +49,13 @@ class MainViewModel: ViewModel() {
     fun loadSuggestions(query: String){
         viewModelScope.launch {
             searchSuggestions = data.getSearchSuggestion(query).toMutableStateList()
+        }
+    }
+
+    fun getProjectsByName(query: String){
+        viewModelScope.launch {
+            searchResult.clear()
+            searchResult.addAll(data.getProjectsByName(query))
         }
     }
 
