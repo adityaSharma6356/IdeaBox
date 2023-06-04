@@ -12,14 +12,24 @@ class DataRepositoryImpl: DataRepository {
 
     private val domains: Domains = Domains()
     private val api = ProjectsApi()
+    private var projectsByName: List<ProjectIdea> = listOf()
+
+    override suspend fun loadProjects() {
+        projectsByName = api.getProjects()
+    }
+
     override suspend fun getProjectsByName(query: String): SnapshotStateList<ProjectIdea> {
         if(query.isBlank()){
             return mutableStateListOf()
         }
-        val data: List<ProjectIdea> = api.getProjects()
+        val data: List<ProjectIdea> = projectsByName
         val finalData: MutableList<ProjectIdea>
         finalData = data.filter { it.name.uppercase().contains(query.uppercase()) }.toMutableStateList()
         return finalData
+    }
+
+    override suspend fun uploadNewProject(data: ProjectIdea) {
+        api.uploadNewProject(data)
     }
 
     override suspend fun getSearchSuggestion(query: String): List<String> {
@@ -28,19 +38,11 @@ class DataRepositoryImpl: DataRepository {
             return data
         }
         var limit = 0
-        for ((domain, subdomains) in domains.domainsWithSubdomains) {
-            if(domain.uppercase().contains(query.uppercase())){
-                data.add(domain)
+        for (thisdata in domains.domainlist) {
+            if(thisdata.uppercase().contains(query.uppercase())){
+                data.add(thisdata)
                 limit++
-            }
-            for (subdomain in subdomains) {
-                if(subdomain.uppercase().contains(query.uppercase())){
-                    data.add(subdomain)
-                    limit++
-                }
-                if(limit>=3){
-                    return data
-                }
+                if(limit>=3) return data
             }
         }
         return data
