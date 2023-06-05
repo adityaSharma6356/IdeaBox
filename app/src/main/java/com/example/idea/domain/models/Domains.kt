@@ -29,6 +29,8 @@ data class Domains(
         "E-learning and Online Courses",
         "Educational Games and Apps",
         "Language Learning",
+        "Reading",
+        "Anime & Manga",
         "STEM Education",
         "Skills Training",
         "Virtual Reality in Education",

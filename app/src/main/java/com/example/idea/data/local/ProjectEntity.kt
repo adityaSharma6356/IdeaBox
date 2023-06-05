@@ -13,5 +13,6 @@ data class ProjectEntity(
     val description: String ,
     val author: String ,
     val dateCreated: Long ,
-    val difficulty: Int
+    val difficulty: Int,
+    val likedByUserId: String
 )

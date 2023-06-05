@@ -8,4 +8,5 @@ sealed class Screen(val route: String,val label: String,@DrawableRes val icon: I
     object MyIdea : Screen("my_ideas", "My Ideas", R.drawable.idea, R.drawable.idea_unselected)
     object Profile : Screen("profile", "Showcase", R.drawable.medal_icon_filled, R.drawable.medal_icon)
     object AddProject : Screen("add", "add", R.drawable.medal_icon_filled, R.drawable.medal_icon)
+    object SingleIdea : Screen("single_idea", "singleIdea", R.drawable.medal_icon_filled, R.drawable.medal_icon)
 }

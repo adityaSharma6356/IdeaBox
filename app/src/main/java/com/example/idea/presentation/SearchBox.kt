@@ -126,7 +126,7 @@ fun SearchBox(mainViewModel: MainViewModel) {
                             }
                         }
                     }
-                    if(mainViewModel.searchResult.isNotEmpty()){
+                    if(mainViewModel.tempSearchResult.isNotEmpty()){
                         Spacer(
                             modifier = Modifier
                                 .padding(top = 15.dp, bottom = 10.dp)
@@ -136,8 +136,8 @@ fun SearchBox(mainViewModel: MainViewModel) {
                         )
                         Text(text = "Projects", fontSize = 18.sp, modifier = Modifier.padding(start = 20.dp, top = 5.dp, bottom = 0.dp))
                         LazyColumn(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
-                            items(mainViewModel.searchResult.size){ index ->
-                                Text(text = mainViewModel.searchResult[index].name, fontSize = 16.sp, maxLines = 1, modifier = Modifier
+                            items(mainViewModel.tempSearchResult.size){ index ->
+                                Text(text = mainViewModel.tempSearchResult[index].name, fontSize = 16.sp, maxLines = 1, modifier = Modifier
                                     .padding(start = 0.dp, top = 25.dp)
                                     .fillMaxWidth(0.8f))
                             }
@@ -147,25 +147,23 @@ fun SearchBox(mainViewModel: MainViewModel) {
             },
             modifier = Modifier,
             leadingIcon = {
-                Crossfade(targetState = mainViewModel.active) {
-                    if(it){
-                        Icon(
-                            painter = painterResource(id = R.drawable.back_icon),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.clickable {
-                                if(mainViewModel.active){
-                                    mainViewModel.active = false
-                                }
+                if(mainViewModel.active){
+                    Icon(
+                        painter = painterResource(id = R.drawable.back_icon),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.clickable {
+                            if(mainViewModel.active){
+                                mainViewModel.active = false
                             }
-                        )
-                    }else {
-                        Icon(
-                            painter = painterResource(id = R.drawable.searc_icon),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
+                        }
+                    )
+                }else {
+                    Icon(
+                        painter = painterResource(id = R.drawable.searc_icon),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
                 }
             }
         )

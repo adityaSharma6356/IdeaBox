@@ -34,6 +34,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.idea.R
 import com.example.idea.presentation.google.GoogleAuthUIClient
 import com.example.idea.util.Screen
+import org.checkerframework.checker.units.qual.s
 
 
 @Composable
@@ -45,26 +46,31 @@ fun MainScreen(
     val navController = rememberNavController()
     Scaffold(
         floatingActionButton = {
-            IconButton(
-                colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.primary),
-                onClick = {
-                    navController.navigate(Screen.AddProject.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
+            val nvbs by navController.currentBackStackEntryAsState()
+            val crdt = nvbs?.destination
+            val slt = crdt?.hierarchy?.any { it.route == Screen.AddProject.route } == true
+            if(!slt){
+                IconButton(
+                    colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    onClick = {
+                        navController.navigate(Screen.AddProject.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
+                    },
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(50.dp)) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 5.dp).fillMaxHeight(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(modifier = Modifier.size(30.dp),painter = painterResource(id = R.drawable.idea_unselected), contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
+                        Text(text = "  idea!! ", maxLines = 2, fontSize = 15.sp, color = MaterialTheme.colorScheme.onPrimary)
                     }
-                },
-                modifier = Modifier
-                    .width(120.dp)
-                    .height(50.dp)) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 5.dp).fillMaxHeight(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(modifier = Modifier.size(30.dp),painter = painterResource(id = R.drawable.idea_unselected), contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
-                    Text(text = "  idea!! ", maxLines = 2, fontSize = 15.sp, color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
         },
@@ -109,7 +115,7 @@ fun MainScreen(
             }
             NavHost(navController = navController, startDestination = Screen.Idea.route, modifier = Modifier.padding(innerPadding)){
                 composable(Screen.Idea.route){
-                    IdeaBoxScreen(mainViewModel)
+                    IdeaBoxScreen(mainViewModel, navController)
                 }
                 composable(Screen.MyIdea.route){
                     MyIdeasScreen(mainViewModel)
@@ -119,6 +125,9 @@ fun MainScreen(
                 }
                 composable(Screen.AddProject.route){
                     AddProjectScreen(mainViewModel)
+                }
+                composable(Screen.SingleIdea.route){
+                    SingleIdeaScreen(mainViewModel, navController)
                 }
             }
         }

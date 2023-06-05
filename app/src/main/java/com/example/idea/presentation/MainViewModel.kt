@@ -1,5 +1,6 @@
 package com.example.idea.presentation
 
+import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
@@ -32,6 +33,7 @@ class MainViewModel: ViewModel() {
     var user by mutableStateOf(User())
     var loginSuccess by mutableStateOf(false)
     var searchResult = mutableStateListOf<ProjectIdea>()
+    var tempSearchResult = mutableStateListOf<ProjectIdea>()
     var showProfileSection by mutableStateOf(false)
     var searchSuggestions = mutableStateListOf<String>()
     var searchFilters = mutableStateListOf<String>()
@@ -52,41 +54,63 @@ class MainViewModel: ViewModel() {
         "Robotics",
         "Social Media and Communication",
         )
+    var isRefreshing by  mutableStateOf(false)
+    var highlightProject by mutableStateOf(ProjectIdea())
 
     val data = DataRepositoryImpl()
     init {
         viewModelScope.launch {
             data.loadProjects()
+            searchResult.addAll(data.projectsByName.toMutableStateList())
         }
     }
-    fun performSearch(query: String){
-
+    fun refresh(indicator: Boolean = true){
+        viewModelScope.launch {
+            if(indicator) isRefreshing = true
+            data.loadProjects()
+            searchResult.clear()
+            searchResult.addAll(data.projectsByName.toMutableStateList())
+            if(indicator) isRefreshing = false
+//            Log.d("firebaselog", "refreshing${searchResult[0].author}")
+        }
     }
 
     fun sortSearchResults(sortBY: SortBy, difficulty: SortBy = SortBy.DIFFICULTY_RANDOM){
+        return
+        var tempList = searchResult
         when(sortBY){
             SortBy.POPULAR -> {
-
+                tempList = searchResult.sortedByDescending { it.stars }.toMutableStateList()
             }
             SortBy.LATEST -> {
-
+                tempList = searchResult.sortedBy { it.dateCreated }.toMutableStateList()
             }
             else -> Unit
         }
+        if(tempList.size<searchResult.size){
+            tempList.addAll(searchResult.filter { !tempList.contains(it) })
+        }
         when(difficulty){
             SortBy.DIFFICULTY_BEGINNER -> {
-
+                tempList.removeIf { it.difficulty!=SortBy.DIFFICULTY_BEGINNER }
             }
             SortBy.DIFFICULTY_INTERMEDIATE -> {
-
+                tempList.removeIf { it.difficulty!=SortBy.DIFFICULTY_INTERMEDIATE }
             }
             SortBy.DIFFICULTY_PRO -> {
-
+                tempList.removeIf { it.difficulty!=SortBy.DIFFICULTY_PRO }
             }
-            SortBy.DIFFICULTY_RANDOM -> {
-
-            }
+            SortBy.DIFFICULTY_RANDOM -> Unit
             else -> Unit
+        }
+        searchResult.clear()
+        searchResult.addAll(tempList)
+    }
+
+    fun likeClick(projectIdea: ProjectIdea){
+        viewModelScope.launch {
+            data.likeProject(projectIdea)
+            refresh(false)
         }
     }
 
@@ -98,8 +122,8 @@ class MainViewModel: ViewModel() {
 
     fun getProjectsByName(query: String){
         viewModelScope.launch {
-            searchResult.clear()
-            searchResult.addAll(data.getProjectsByName(query))
+            tempSearchResult.clear()
+            tempSearchResult.addAll(data.getProjectsByName(query))
         }
     }
 

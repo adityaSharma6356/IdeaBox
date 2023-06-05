@@ -12,10 +12,14 @@ class DataRepositoryImpl: DataRepository {
 
     private val domains: Domains = Domains()
     private val api = ProjectsApi()
-    private var projectsByName: List<ProjectIdea> = listOf()
+    var projectsByName: List<ProjectIdea> = listOf()
 
     override suspend fun loadProjects() {
         projectsByName = api.getProjects()
+    }
+
+    override suspend fun likeProject(projectIdea: ProjectIdea) {
+        api.likeProject(projectIdea)
     }
 
     override suspend fun getProjectsByName(query: String): SnapshotStateList<ProjectIdea> {

@@ -65,4 +65,8 @@ class ProjectsApi {
             return listOf()
         }
     }
+
+    suspend fun likeProject(projectIdea: ProjectIdea){
+        projectCollection.document(projectIdea.projectId).set(projectIdea)
+    }
 }

@@ -8,6 +8,10 @@ interface DataRepository {
         data: ProjectIdea
     )
 
+    suspend fun likeProject(
+        projectIdea: ProjectIdea
+    )
+
     suspend fun getProjectsByName(
         query: String
     ): List<ProjectIdea>
