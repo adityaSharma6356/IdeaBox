@@ -1,4 +1,4 @@
-package com.example.idea.util
+package com.example.idea.presentation.util
 
 import androidx.annotation.DrawableRes
 import com.example.idea.R

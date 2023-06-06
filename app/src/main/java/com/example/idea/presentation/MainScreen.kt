@@ -33,8 +33,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.idea.R
 import com.example.idea.presentation.google.GoogleAuthUIClient
-import com.example.idea.util.Screen
-import org.checkerframework.checker.units.qual.s
+import com.example.idea.presentation.util.Screen
 
 
 @Composable
@@ -111,7 +110,7 @@ fun MainScreen(
                     },
         content = { innerPadding ->
             if(mainViewModel.showProfileSection){
-                ProfileAlertBox(mainViewModel, innerPadding, mainNavController, googleAuthUiClient)
+                ProfileAlertBox(mainViewModel, mainNavController, googleAuthUiClient)
             }
             NavHost(navController = navController, startDestination = Screen.Idea.route, modifier = Modifier.padding(innerPadding)){
                 composable(Screen.Idea.route){
@@ -133,6 +132,8 @@ fun MainScreen(
         }
     )
 }
+
+
 
 
 

@@ -1,4 +1,4 @@
-package com.example.idea.util
+package com.example.idea.presentation.util
 
 enum class SortBy {
     LATEST,

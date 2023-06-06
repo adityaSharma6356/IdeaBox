@@ -54,11 +54,11 @@ fun SearchBox(mainViewModel: MainViewModel) {
                             .clickable { mainViewModel.query = "" })
                     }
                 } else {
-                    if(mainViewModel.user.profile!="") {
+                    if(mainViewModel.state.user.profile!="") {
                         AsyncImage(
                             model = ImageRequest
                                 .Builder(LocalContext.current)
-                                .data(mainViewModel.user.profile)
+                                .data(mainViewModel.state.user.profile)
                                 .build(),
                             contentDescription = null,
                             modifier = Modifier
@@ -101,17 +101,17 @@ fun SearchBox(mainViewModel: MainViewModel) {
                             .padding(10.dp)
                             .height(300.dp)
                             .fillMaxWidth()){
-                        items(mainViewModel.trendingTopic.size){ index ->
+                        items(mainViewModel.state.trendingTopic.size){ index ->
                             Box(modifier = Modifier
                                 .padding(vertical = 2.dp)
                                 .height(40.dp)
                                 .clickable {
-                                    mainViewModel.query = mainViewModel.trendingTopic[index]
+                                    mainViewModel.query = mainViewModel.state.trendingTopic[index]
                                     mainViewModel.loadSuggestions(mainViewModel.query)
                                 }
                                 .clip(RoundedCornerShape(50))
                                 .background(MaterialTheme.colorScheme.primary), contentAlignment = Alignment.Center) {
-                                Text(text = mainViewModel.trendingTopic[index], fontSize = 14.sp, color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.padding(horizontal = 5.dp))
+                                Text(text = mainViewModel.state.trendingTopic[index], fontSize = 14.sp, color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.padding(horizontal = 5.dp))
                             }
                         }
                     }
@@ -126,7 +126,7 @@ fun SearchBox(mainViewModel: MainViewModel) {
                             }
                         }
                     }
-                    if(mainViewModel.tempSearchResult.isNotEmpty()){
+                    if(mainViewModel.state.tempSearchList.isNotEmpty()){
                         Spacer(
                             modifier = Modifier
                                 .padding(top = 15.dp, bottom = 10.dp)
@@ -136,8 +136,8 @@ fun SearchBox(mainViewModel: MainViewModel) {
                         )
                         Text(text = "Projects", fontSize = 18.sp, modifier = Modifier.padding(start = 20.dp, top = 5.dp, bottom = 0.dp))
                         LazyColumn(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
-                            items(mainViewModel.tempSearchResult.size){ index ->
-                                Text(text = mainViewModel.tempSearchResult[index].name, fontSize = 16.sp, maxLines = 1, modifier = Modifier
+                            items(mainViewModel.state.tempSearchList.size){ index ->
+                                Text(text = mainViewModel.state.tempSearchList[index].name, fontSize = 16.sp, maxLines = 1, modifier = Modifier
                                     .padding(start = 0.dp, top = 25.dp)
                                     .fillMaxWidth(0.8f))
                             }

@@ -1,7 +1,7 @@
 package com.example.idea.presentation.mappers
 
 import androidx.compose.ui.graphics.Color
-import com.example.idea.util.SortBy
+import com.example.idea.presentation.util.SortBy
 
 fun toName(it: SortBy): String {
     when(it){

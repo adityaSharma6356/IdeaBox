@@ -1,15 +1,11 @@
 package com.example.idea.presentation
 
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.IntentSenderRequest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -30,8 +26,6 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopCenter
@@ -43,7 +37,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,7 +50,6 @@ import com.example.idea.presentation.google.GoogleAuthUIClient
 @Composable
 fun ProfileAlertBox(
     mainViewModel: MainViewModel,
-    padding: PaddingValues,
     navController: NavController,
     googleAuthUIClient: GoogleAuthUIClient
 ) {
@@ -99,11 +91,11 @@ fun ProfileAlertBox(
                     verticalAlignment = CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    if (mainViewModel.user.profile != "") {
+                    if (mainViewModel.state.user.profile != "") {
                         AsyncImage(
                             model = ImageRequest
                                 .Builder(LocalContext.current)
-                                .data(mainViewModel.user.profile)
+                                .data(mainViewModel.state.user.profile)
                                 .build(),
                             contentDescription = null,
                             modifier = Modifier
@@ -117,7 +109,7 @@ fun ProfileAlertBox(
                                 .fillMaxHeight()
                         ) {
                             Text(
-                                text = mainViewModel.user.name,
+                                text = mainViewModel.state.user.name,
                                 fontSize = 15.sp,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.padding(top = 8.dp)
@@ -125,7 +117,7 @@ fun ProfileAlertBox(
                         }
                     }
                 }
-                if (mainViewModel.user.id == "") {
+                if (mainViewModel.state.user.id == "") {
                     Spacer(modifier = Modifier.height(50.dp))
                     Text(
                         text = "Login or Register",

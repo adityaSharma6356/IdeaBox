@@ -56,6 +56,8 @@ data class Domains(
         "Project Management",
         "Business Analytics",
         "Space Exploration",
+        "Animals",
+        "Pets",
         "Astrophysics and Astronomy",
         "Biotechnology",
         "Nanotechnology",

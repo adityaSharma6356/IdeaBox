@@ -1,6 +1,6 @@
 package com.example.idea.domain.models
 
-import com.example.idea.util.SortBy
+import com.example.idea.presentation.util.SortBy
 import com.google.firebase.Timestamp
 
 data class ProjectIdea(

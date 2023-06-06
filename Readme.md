@@ -11,4 +11,4 @@ A Material 3 and Jetpack Compose application to look for your next project idea
 - Google Login
 - Material 3 theming 
 - Dependency Injection with Hilt
-- MVI clean Architecture
+- Clean Architecture

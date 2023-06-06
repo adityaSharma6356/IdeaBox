@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
                     val data = googleAuthUiClient.getSignedInUser()
 
                     if(data != null){
-                        mainViewModel.user = data
+                        mainViewModel.state.user = data
                         mainViewModel.loginSuccess = true
                     }
                     val launcher = rememberLauncherForActivityResult(
@@ -84,7 +84,7 @@ class MainActivity : ComponentActivity() {
                                     val signInResult = googleAuthUiClient.signInWithIntent(
                                         intent = result.data ?: return@launch
                                     )
-                                    mainViewModel.user = signInResult.data ?: User()
+                                    mainViewModel.state.user = signInResult.data ?: User()
                                     navController.navigate("main"){
                                         popUpTo("login") {
                                             inclusive = true
