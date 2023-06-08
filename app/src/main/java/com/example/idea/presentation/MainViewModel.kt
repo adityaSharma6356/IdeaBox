@@ -1,5 +1,6 @@
 package com.example.idea.presentation
 
+import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
@@ -49,18 +50,28 @@ class MainViewModel: ViewModel() {
     }
 
     fun onEvent(event: UiEvents){
-
+        when(event){
+            is UiEvents.LikeProject ->{
+                viewModelScope.launch {
+                    if(state.user.id.isBlank()){
+                        Toast.makeText(event.context, "Login required", Toast.LENGTH_SHORT).show()
+                    } else {
+                        likeClick(event.thisProject)
+                    }
+                }
+            }
+            else -> Unit
+        }
     }
     fun refresh(indicator: Boolean = true){
         viewModelScope.launch {
-            isFilterChanging = false
             if(indicator) isRefreshing = true
             state.currentDifficulty = SortBy.DIFFICULTY_RANDOM
             state.currentSortBy = SortBy.LATEST
             state = state.copy(mainList = data.loadAllProjects().toMutableList())
             state = state.copy(tempList = state.mainList)
+            state.sortByPopularity()
             if(indicator) isRefreshing = false
-            isFilterChanging = true
         }
     }
 
@@ -75,7 +86,7 @@ class MainViewModel: ViewModel() {
         }
     }
 
-    fun likeClick(projectIdea: ProjectIdea){
+    private fun likeClick(projectIdea: ProjectIdea){
         viewModelScope.launch {
             data.likeProject(projectIdea)
             refresh(false)

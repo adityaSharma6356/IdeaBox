@@ -6,6 +6,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,12 +29,14 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -46,6 +49,7 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -61,6 +65,7 @@ import com.example.idea.presentation.mappers.colorProvider
 import com.example.idea.presentation.mappers.toName
 import com.example.idea.presentation.util.Screen
 import com.example.idea.presentation.util.SortBy
+import com.example.idea.presentation.util.UiEvents
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
@@ -265,8 +270,9 @@ fun IdeaBoxScreen(mainViewModel: MainViewModel, navController: NavHostController
                     items(mainViewModel.state.tempList.size, key = {
                         mainViewModel.state.tempList[it].projectId
                     }){ index ->
-                        Card(
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)),
+                        OutlinedCard(
+                            border = BorderStroke((0.5).dp, Color(255, 255, 255, 74)),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)),
                             modifier = Modifier
                                 .padding(vertical = 10.dp)
                                 .clickable {
@@ -281,6 +287,7 @@ fun IdeaBoxScreen(mainViewModel: MainViewModel, navController: NavHostController
                                 .fillMaxWidth(0.95f)
                                 .heightIn(max = 250.dp)) {
                             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                val context = LocalContext.current
                                 Text(
                                     text = mainViewModel.state.tempList[index].name,
                                     color = MaterialTheme.colorScheme.tertiary,
@@ -293,11 +300,11 @@ fun IdeaBoxScreen(mainViewModel: MainViewModel, navController: NavHostController
                                     if(!mainViewModel.state.tempList[index].likedByUserId.contains(mainViewModel.state.user.id)){
                                         val tempdata = mainViewModel.state.tempList[index]
                                         tempdata.likedByUserId.add(mainViewModel.state.user.id)
-                                        mainViewModel.likeClick(tempdata)
+                                        mainViewModel.onEvent(UiEvents.LikeProject(tempdata, context))
                                     } else {
                                         val tempdata = mainViewModel.state.tempList[index]
                                         tempdata.likedByUserId.remove(mainViewModel.state.user.id)
-                                        mainViewModel.likeClick(tempdata)
+                                        mainViewModel.onEvent(UiEvents.LikeProject(tempdata, context))
                                     }
                                 }, modifier = Modifier
                                     .padding(top = 5.dp)

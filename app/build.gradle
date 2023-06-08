@@ -23,11 +23,10 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
-        signingConfig signingConfigs.debug
     }
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -75,6 +74,7 @@ dependencies {
 
     implementation "com.airbnb.android:lottie-compose:6.0.0"
 
+    implementation "com.google.accompanist:accompanist-insets:0.24.1-alpha"
 
     implementation "androidx.compose.material3:material3:1.1.0"
     implementation "androidx.compose.material3:material3-window-size-class:1.1.0"

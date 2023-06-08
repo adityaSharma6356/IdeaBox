@@ -24,7 +24,8 @@ data class UiStates(
         "Robotics",
         "Social Media and Communication",
     ),
-
+    var showErrorCard: Boolean = false,
+    var draftSaved :Boolean = false
 ){
     fun sortByPopularity(){
         tempList = if(currentDifficulty==SortBy.DIFFICULTY_RANDOM){

@@ -5,12 +5,12 @@ import com.google.firebase.Timestamp
 
 data class ProjectIdea(
     val projectId: String = "",
-    val name: String = "",
-    val categories: MutableList<String> = mutableListOf(),
-    val stars : Int = 0,
-    val description: String = "",
-    val author: String = "",
-    val dateCreated: Timestamp = Timestamp(0L, 0),
-    val difficulty: SortBy = SortBy.DIFFICULTY_RANDOM,
-    val likedByUserId: MutableList<String> = mutableListOf()
+    var name: String = "",
+    var categories: MutableList<String> = mutableListOf(),
+    var stars : Int = 0,
+    var description: String = "",
+    var author: String = "",
+    var dateCreated: Timestamp = Timestamp(0L, 0),
+    var difficulty: SortBy = SortBy.DIFFICULTY_RANDOM,
+    var likedByUserId: MutableList<String> = mutableListOf()
 )
