@@ -72,7 +72,8 @@ class GoogleAuthUIClient(
         User(
             id = uid,
             name = displayName ?: "",
-            profile = photoUrl?.toString() ?: ""
+            profile = photoUrl?.toString() ?: "",
+            email = email ?: ""
         )
     }
 

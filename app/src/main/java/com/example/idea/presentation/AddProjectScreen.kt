@@ -1,11 +1,14 @@
 package com.example.idea.presentation
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -15,15 +18,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,34 +46,30 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.idea.R
+import com.example.idea.presentation.mappers.toName
 import com.example.idea.presentation.util.MultiSelect
+import com.example.idea.presentation.util.SortBy
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsWithImePadding
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun AddProjectScreen(mainViewModel: MainViewModel) {
     ProvideWindowInsets() {
         val addProjectViewModel = viewModel<AddProjectViewModel>()
-        var categoriesList by remember {
-            mutableStateOf(
-                addProjectViewModel.categories.map {
-                    MultiSelect(
-                        name = it,
-                        selected = false
-                    )
-                }
-            )
-        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -71,6 +77,16 @@ fun AddProjectScreen(mainViewModel: MainViewModel) {
                 .navigationBarsWithImePadding(),
             horizontalAlignment = CenterHorizontally
         ) {
+            var categoriesList by remember {
+                mutableStateOf(
+                    addProjectViewModel.categoriesList.map {
+                        MultiSelect(
+                            name = it,
+                            selected = false
+                        )
+                    }
+                )
+            }
             Text(
                 text = "Drop your Idea",
                 fontSize = 20.sp,
@@ -107,7 +123,7 @@ fun AddProjectScreen(mainViewModel: MainViewModel) {
                     .fillMaxWidth(0.9f)
             )
             Box(modifier = Modifier
-                .heightIn(min = 50.dp)
+                .heightIn(min = 50.dp, max = 200.dp)
                 .fillMaxWidth(0.9f)
                 .clickable {
                     addProjectViewModel.alertOpen = true
@@ -118,21 +134,89 @@ fun AddProjectScreen(mainViewModel: MainViewModel) {
                     shape = RoundedCornerShape(10.dp)
                 )){
                 if(addProjectViewModel.categoriesFinal.isEmpty()){
-                    Text(text = "Select Categories", color = MaterialTheme.colorScheme.primary)
+                    Text(text = "Select Categories", color = MaterialTheme.colorScheme.primary, modifier = Modifier.align(Center))
                 }
-                LazyVerticalGrid(columns = GridCells.Adaptive(50.dp)){
-                    items(addProjectViewModel.categoriesFinal.size){ index ->
-                        IconButton(onClick = {}) {
-
+                LazyHorizontalStaggeredGrid(rows = StaggeredGridCells.Adaptive(30.dp), contentPadding = PaddingValues(vertical = 10.dp) ){
+                    items(addProjectViewModel.categoriesFinal.size, key = {
+                        addProjectViewModel.categoriesFinal[it].name
+                    }){ index ->
+                        Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier
+                            .padding(5.dp)
+                            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(50))
+                            .height(30.dp)){
+                            Text(
+                                text = addProjectViewModel.categoriesFinal[index].name,
+                                modifier = Modifier.padding(horizontal = 5.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontSize = 13.sp
+                            )
+                            Icon(
+                                painter = painterResource(id = R.drawable.clear_icon),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .clickable {
+                                        categoriesList[addProjectViewModel.categoriesFinal[index].selectorIndex].selected =
+                                            false
+                                        addProjectViewModel.categoriesFinal.removeAt(index)
+                                    }
+                                    .padding(end = 5.dp)
+                                    .size(20.dp),
+                                tint = MaterialTheme.colorScheme.onPrimary
+                            )
                         }
                     }
                 }
             }
+            ExposedDropdownMenuBox(modifier = Modifier
+                .padding(top = 10.dp)
+                .fillMaxWidth(0.9f),
+                expanded = addProjectViewModel.menuExpanded,
+                onExpandedChange = {
+                    addProjectViewModel.menuExpanded = !addProjectViewModel.menuExpanded
+                }) {
+                TextField(
+                    modifier = Modifier.fillMaxWidth().menuAnchor(),
+                    readOnly = true,
+                    label = { Text(text = "Difficulty")},
+                    value = toName(addProjectViewModel.difficulty),
+                    onValueChange = {},
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = addProjectViewModel.menuExpanded)
+                    },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors()
+                )
+                ExposedDropdownMenu(expanded = addProjectViewModel.menuExpanded, onDismissRequest = { addProjectViewModel.menuExpanded = false}) {
+                    DropdownMenuItem(
+                        text = { Text(text = "Beginner") },
+                        onClick = {
+                            addProjectViewModel.difficulty = SortBy.DIFFICULTY_BEGINNER
+                            addProjectViewModel.menuExpanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(text = "Intermediate") },
+                        onClick = {
+                            addProjectViewModel.difficulty = SortBy.DIFFICULTY_INTERMEDIATE
+                            addProjectViewModel.menuExpanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(text = "Pro") },
+                        onClick = {
+                            addProjectViewModel.difficulty = SortBy.DIFFICULTY_PRO
+                            addProjectViewModel.menuExpanded = false
+                        }
+                    )
+                }
+            }
             if(addProjectViewModel.alertOpen){
-                AlertDialog(onDismissRequest = { addProjectViewModel.alertOpen = false }) {
-                    LazyColumn(modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .fillMaxHeight(0.7f)) {
+                AlertDialog(
+                    properties = DialogProperties(usePlatformDefaultWidth = true),
+                    modifier = Modifier
+                        .height(600.dp)
+                    ,onDismissRequest = { addProjectViewModel.alertOpen = false }
+                ) {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
                         items(categoriesList.size){ index ->
                             Row(
                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -140,8 +224,15 @@ fun AddProjectScreen(mainViewModel: MainViewModel) {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(50.dp)) {
-                                Text(text = categoriesList[index].name, fontSize = 15.sp , modifier = Modifier.padding(start = 10.dp))
-                                Checkbox(checked = categoriesList[index].selected, onCheckedChange = {categoriesList[index].selected = it}, modifier = Modifier.padding(end = 10.dp))
+                                Text(text = categoriesList[index].name, fontSize = 15.sp , maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                                Checkbox(checked = categoriesList[index].selected, onCheckedChange = {
+                                    if(it){
+                                        addProjectViewModel.categoriesFinal.add(addProjectViewModel.CateBoxState(categoriesList[index].name, index))
+                                    } else {
+                                        addProjectViewModel.categoriesFinal.remove(addProjectViewModel.CateBoxState(categoriesList[index].name, index))
+                                    }
+                                    categoriesList[index].selected = it
+                                }, modifier = Modifier)
                             }
                         }
                     }

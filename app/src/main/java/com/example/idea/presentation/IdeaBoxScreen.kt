@@ -47,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -310,7 +311,11 @@ fun IdeaBoxScreen(mainViewModel: MainViewModel, navController: NavHostController
                                     .padding(top = 5.dp)
                                     .size(70.dp, 40.dp)) {
                                     Row(verticalAlignment = CenterVertically) {
-                                        Text(text = mainViewModel.state.tempList[index].likedByUserId.size.toString(), color = Color.Yellow, fontSize = 19.sp)
+                                        Text(
+                                            text = mainViewModel.state.tempList[index].likedByUserId.size.toString(),
+                                            color = Color.Yellow,
+                                            fontSize = 19.sp,
+                                        )
                                         Icon(painter = painterResource(
                                             id = if (mainViewModel.state.tempList[index].likedByUserId.contains(mainViewModel.state.user.id))
                                                 R.drawable.starred_icon
@@ -327,17 +332,18 @@ fun IdeaBoxScreen(mainViewModel: MainViewModel, navController: NavHostController
                                 }
                             }
                             val tempOP = MaterialTheme.colorScheme.secondary
-                            var tempColor by remember {
+                            val tempColor by remember {
                                 mutableStateOf(colorProvider(mainViewModel.state.tempList[index].difficulty, tempOP))
                             }
                             Text(
-                                text = " "+toName(mainViewModel.state.tempList[index].difficulty)+" ",
+                                text = toName(mainViewModel.state.tempList[index].difficulty),
                                 fontSize = 12.sp,
                                 color = tempColor,
                                 modifier = Modifier
                                     .padding(top = 5.dp, start = 15.dp)
                                     .border(1.dp, tempColor, RoundedCornerShape(50))
-                                    .padding(3.dp),
+                                    .shadow(10.dp , spotColor = tempColor, shape = RoundedCornerShape(50))
+                                    .padding(horizontal = 9.dp, vertical = 3.dp),
                             )
                             val tempCatList = mainViewModel.state.tempList[index].categories
                             LazyRow(modifier = Modifier

@@ -33,10 +33,10 @@ fun colorProvider(it: SortBy, secondary: Color): Color {
             return Color(72, 155, 56, 255)
         }
         SortBy.DIFFICULTY_INTERMEDIATE -> {
-            return Color(41, 105, 182, 255)
+            return Color(52, 128, 221, 255)
         }
         SortBy.DIFFICULTY_PRO -> {
-            return Color(146, 39, 39, 255)
+            return Color(204, 55, 55, 255)
         }
         else -> {
             return Color(255, 255, 255, 255)

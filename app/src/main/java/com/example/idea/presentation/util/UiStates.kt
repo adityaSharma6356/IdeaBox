@@ -25,8 +25,16 @@ data class UiStates(
         "Social Media and Communication",
     ),
     var showErrorCard: Boolean = false,
-    var draftSaved :Boolean = false
+    var draftSaved :Boolean = false,
+    var currentQuery : String = ""
 ){
+    fun search(){
+        if(currentQuery.isNotBlank()){
+            tempList = mainList.filter {
+                it.categories.contains(currentQuery) || it.name.uppercase().contains(currentQuery.uppercase())
+            }.toMutableList()
+        }
+    }
     fun sortByPopularity(){
         tempList = if(currentDifficulty==SortBy.DIFFICULTY_RANDOM){
             mainList

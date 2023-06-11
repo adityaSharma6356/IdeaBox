@@ -1,7 +1,6 @@
 package com.example.idea.presentation
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,10 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,11 +36,13 @@ import com.example.idea.R
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun SearchBox(mainViewModel: MainViewModel) {
+fun SearchBox(mainViewModel: MainViewModel, modifier: Modifier = Modifier) {
     BackHandler(mainViewModel.query.isNotBlank() && !mainViewModel.active) {
         mainViewModel.query = ""
+        mainViewModel.state = mainViewModel.state.copy(currentQuery = "")
+        mainViewModel.state = mainViewModel.state.copy(tempList = mainViewModel.state.mainList)
     }
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+    Box(contentAlignment = Alignment.BottomCenter, modifier = modifier.heightIn(min = 100.dp).fillMaxWidth()) {
         SearchBar(
             trailingIcon = {
                 if(mainViewModel.active){
@@ -87,7 +85,9 @@ fun SearchBox(mainViewModel: MainViewModel) {
                 mainViewModel.getProjectsByName(mainViewModel.query)
             },
             onSearch = {
-
+                mainViewModel.state.currentQuery = mainViewModel.query
+                mainViewModel.state.search()
+                mainViewModel.active = false
             },
             active = mainViewModel.active,
             onActiveChange = {mainViewModel.active = it},
@@ -108,6 +108,9 @@ fun SearchBox(mainViewModel: MainViewModel) {
                                 .clickable {
                                     mainViewModel.query = mainViewModel.state.trendingTopic[index]
                                     mainViewModel.loadSuggestions(mainViewModel.query)
+                                    mainViewModel.state.currentQuery = mainViewModel.query
+                                    mainViewModel.state.search()
+                                    mainViewModel.active = false
                                 }
                                 .clip(RoundedCornerShape(50))
                                 .background(MaterialTheme.colorScheme.primary), contentAlignment = Alignment.Center) {
@@ -122,7 +125,13 @@ fun SearchBox(mainViewModel: MainViewModel) {
                             items(mainViewModel.searchSuggestions.size){ index ->
                                 Text(text = mainViewModel.searchSuggestions[index], fontSize = 16.sp, maxLines = 1, modifier = Modifier
                                     .padding(start = 0.dp, top = 25.dp)
-                                    .fillMaxWidth(0.8f))
+                                    .fillMaxWidth(0.8f)
+                                    .clickable {
+                                        mainViewModel.query = mainViewModel.searchSuggestions[index]
+                                        mainViewModel.state.currentQuery = mainViewModel.query
+                                        mainViewModel.state.search()
+                                        mainViewModel.active = false
+                                    })
                             }
                         }
                     }
@@ -139,7 +148,13 @@ fun SearchBox(mainViewModel: MainViewModel) {
                             items(mainViewModel.state.tempSearchList.size){ index ->
                                 Text(text = mainViewModel.state.tempSearchList[index].name, fontSize = 16.sp, maxLines = 1, modifier = Modifier
                                     .padding(start = 0.dp, top = 25.dp)
-                                    .fillMaxWidth(0.8f))
+                                    .fillMaxWidth(0.8f)
+                                    .clickable {
+                                        mainViewModel.query = mainViewModel.state.tempSearchList[index].name
+                                        mainViewModel.state.currentQuery = mainViewModel.query
+                                        mainViewModel.state.search()
+                                        mainViewModel.active = false
+                                    })
                             }
                         }
                     }

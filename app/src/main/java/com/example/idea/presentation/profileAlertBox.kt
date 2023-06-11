@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -111,8 +112,16 @@ fun ProfileAlertBox(
                             Text(
                                 text = mainViewModel.state.user.name,
                                 fontSize = 15.sp,
+                                maxLines = 1,
                                 color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(top = 8.dp)
+                                modifier = Modifier.padding(top = 5.dp)
+                            )
+                            Text(
+                                text = mainViewModel.state.user.email,
+                                maxLines = 1,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Thin,
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                         }
                     }
