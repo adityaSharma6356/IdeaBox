@@ -28,6 +28,8 @@ class MainViewModel: ViewModel() {
     var openFilter by  mutableStateOf(false)
     var loginSuccess by mutableStateOf(false)
     var showProfileSection by mutableStateOf(false)
+    var showBar by mutableStateOf(false)
+    var barMessage by mutableStateOf("")
     var searchSuggestions = mutableStateListOf<String>()
     var searchFilters = mutableStateListOf<String>()
     val navItems = listOf(
@@ -51,6 +53,17 @@ class MainViewModel: ViewModel() {
 
     fun onEvent(event: UiEvents){
         when(event){
+            is UiEvents.SetMyIdeaView -> {
+                state = state.copy(setView = 0)
+                state.setView()
+            }
+            is UiEvents.SetBookmarkView -> {
+                state = state.copy(setView = 1)
+                state.setView()
+            }
+            is UiEvents.DeleteIdea -> {
+                deleteIdea(event.data)
+            }
             is UiEvents.LikeProject ->{
                 viewModelScope.launch {
                     if(state.user.id.isBlank()){
@@ -60,7 +73,26 @@ class MainViewModel: ViewModel() {
                     }
                 }
             }
+            is UiEvents.Bookmark -> {
+                likeClick(event.data)
+            }
+            is UiEvents.UploadIdea -> {
+                uploadIdea(event.data)
+            }
+            is UiEvents.ShowBar -> {
+                showBarWithMessage(event.message)
+            }
             else -> Unit
+        }
+    }
+    private fun deleteIdea(project: ProjectIdea){
+        viewModelScope.launch {
+            if(data.deleteProject(project)){
+                showBarWithMessage("Idea Deleted")
+                refresh(false)
+            } else {
+                showBarWithMessage("Something went wrong :(")
+            }
         }
     }
     fun refresh(indicator: Boolean = true){
@@ -72,6 +104,24 @@ class MainViewModel: ViewModel() {
             state = state.copy(tempList = state.mainList)
             state.sortByPopularity()
             if(indicator) isRefreshing = false
+        }
+    }
+    private fun showBarWithMessage(message: String){
+        viewModelScope.launch {
+            barMessage = message
+            showBar = true
+            delay(1500)
+            showBar = false
+            barMessage = ""
+        }
+    }
+    private fun uploadIdea(project: ProjectIdea){
+        viewModelScope.launch {
+            if(data.uploadNewProject(project)){
+                showBarWithMessage("Idea Uploaded :D")
+            } else {
+                showBarWithMessage("Something went wrong :(")
+            }
         }
     }
 

@@ -11,5 +11,10 @@ sealed class UiEvents{
     data class LoginToGoogle(val googleAuthUIClient: GoogleAuthUIClient, val launcher: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>): UiEvents()
     data class LoadData(val states: UiStates) : UiEvents()
     data class LikeProject(val thisProject:ProjectIdea, val context: Context) : UiEvents()
-
+    data class UploadIdea(val data: ProjectIdea) : UiEvents()
+    data class ShowBar(val message : String) : UiEvents()
+    data class Bookmark(val data : ProjectIdea) : UiEvents()
+    data class DeleteIdea(val data: ProjectIdea) : UiEvents()
+    object SetBookmarkView : UiEvents()
+    object SetMyIdeaView : UiEvents()
 }

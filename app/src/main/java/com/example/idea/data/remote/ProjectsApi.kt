@@ -31,17 +31,17 @@ class ProjectsApi {
             return null
         }
     }
-    suspend fun uploadNewProject(data: ProjectIdea){
+    suspend fun uploadNewProject(data: ProjectIdea): Boolean{
+        var result = false
         projectCollection
             .add(data)
             .addOnSuccessListener {
                 projectCollection.document(it.id).update("projectId", it.id).addOnFailureListener { exc ->
+                    result = true
                     Log.d("firebaselog", "Id Update Failed!! ,Reason : $exc")
                 }
-            }
-            .addOnFailureListener {
-                Log.d("firebaselog", "upload Failed!! ,Reason : $it")
-            }
+            }.await()
+        return result
     }
     suspend fun getProjectsByCategories(queryList: List<String>): List<ProjectIdea>?{
         return try {
@@ -64,6 +64,12 @@ class ProjectsApi {
         } catch (e: FirebaseTooManyRequestsException){
             return listOf()
         }
+    }
+
+    suspend fun deleteProject(data: ProjectIdea): Boolean{
+        var result  = false
+        projectCollection.document(data.projectId).delete().addOnSuccessListener { result = true }.await()
+        return result
     }
 
     suspend fun likeProject(projectIdea: ProjectIdea){

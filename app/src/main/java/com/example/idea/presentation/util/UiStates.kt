@@ -10,6 +10,7 @@ data class UiStates(
     var tempList: MutableList<ProjectIdea> = mutableListOf(),
     var mainList: MutableList<ProjectIdea> = mutableListOf(),
     var tempSearchList: MutableList<ProjectIdea> = mutableListOf(),
+    var secondList: MutableList<ProjectIdea> = mutableListOf(),
     var currentSortBy: SortBy = SortBy.LATEST,
     var currentDifficulty: SortBy = SortBy.DIFFICULTY_RANDOM,
     var trendingTopic:List<String> = listOf(
@@ -26,8 +27,16 @@ data class UiStates(
     ),
     var showErrorCard: Boolean = false,
     var draftSaved :Boolean = false,
-    var currentQuery : String = ""
+    var currentQuery : String = "",
+    var setView: Int = 0
 ){
+    fun setView(){
+        secondList = if(setView==1){
+            mainList.filter { it.bookMarkedByUsers.contains(user.id) }.toMutableList()
+        } else {
+            mainList.filter { it.author == user.id }.toMutableList()
+        }
+    }
     fun search(){
         if(currentQuery.isNotBlank()){
             tempList = mainList.filter {

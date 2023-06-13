@@ -10,6 +10,9 @@ class DataRepositoryImpl: DataRepository {
     private val domains: Domains = Domains()
     private val api = ProjectsApi()
 
+    override suspend fun deleteProject(data: ProjectIdea): Boolean {
+        return api.deleteProject(data)
+    }
 
     override suspend fun loadAllProjects(): List<ProjectIdea> {
         return api.getProjects()
@@ -19,8 +22,8 @@ class DataRepositoryImpl: DataRepository {
         api.likeProject(projectIdea)
     }
 
-    override suspend fun uploadNewProject(data: ProjectIdea) {
-        api.uploadNewProject(data)
+    override suspend fun uploadNewProject(data: ProjectIdea): Boolean {
+        return api.uploadNewProject(data)
     }
 
     override suspend fun getSearchSuggestion(query: String): List<String> {

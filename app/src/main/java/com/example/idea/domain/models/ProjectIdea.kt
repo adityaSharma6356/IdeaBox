@@ -12,5 +12,6 @@ data class ProjectIdea(
     var author: String = "",
     var dateCreated: Timestamp = Timestamp(0L, 0),
     var difficulty: SortBy = SortBy.DIFFICULTY_RANDOM,
-    var likedByUserId: MutableList<String> = mutableListOf()
+    var likedByUserId: MutableList<String> = mutableListOf(),
+    var bookMarkedByUsers: MutableList<String> = mutableListOf()
 )
