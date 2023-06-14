@@ -82,9 +82,9 @@ fun IdeasList(mainViewModel: MainViewModel, navController: NavController, tempLi
                                     mainViewModel.onEvent(UiEvents.DeleteIdea(tempList[index]))
                                     showAlert = false
                                 }
-                            .fillMaxWidth()
-                            .height(100.dp)
-                            .background(MaterialTheme.colorScheme.primary)) {
+                                .fillMaxWidth()
+                                .height(100.dp)
+                                .background(MaterialTheme.colorScheme.primary)) {
                             Text(text = "Delete Idea", fontSize = 20.sp, color = MaterialTheme.colorScheme.onPrimary)
                         }
                         Box(
@@ -93,9 +93,9 @@ fun IdeasList(mainViewModel: MainViewModel, navController: NavController, tempLi
                                 .clickable {
                                     showAlert = false
                                 }
-                            .fillMaxWidth()
-                            .height(150.dp)
-                            .background(MaterialTheme.colorScheme.surface)) {
+                                .fillMaxWidth()
+                                .height(150.dp)
+                                .background(MaterialTheme.colorScheme.surface)) {
                             Text(text = "Cancel", fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
@@ -188,6 +188,11 @@ fun IdeasList(mainViewModel: MainViewModel, navController: NavController, tempLi
                             colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.surface),
                             onClick = { /*TODO*/ },
                             modifier = Modifier
+                                .shadow(
+                                    10.dp,
+                                    spotColor = MaterialTheme.colorScheme.onSurface,
+                                    shape = RoundedCornerShape(50)
+                                )
                                 .align(Alignment.CenterVertically)
                         ) {
                             Icon(
@@ -201,6 +206,11 @@ fun IdeasList(mainViewModel: MainViewModel, navController: NavController, tempLi
                             colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.surface),
                             onClick = { showAlert = true },
                             modifier = Modifier
+                                .shadow(
+                                    10.dp,
+                                    spotColor = MaterialTheme.colorScheme.onSurface,
+                                    shape = RoundedCornerShape(50)
+                                )
                                 .align(Alignment.CenterVertically)
                         ) {
                             Icon(
@@ -231,6 +241,11 @@ fun IdeasList(mainViewModel: MainViewModel, navController: NavController, tempLi
                             }
                         },
                         modifier = Modifier
+                            .shadow(
+                                10.dp,
+                                spotColor = if (contains) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                shape = RoundedCornerShape(50)
+                            )
                             .align(Alignment.CenterVertically)
                     ) {
                         Icon(
@@ -278,7 +293,7 @@ fun IdeasList(mainViewModel: MainViewModel, navController: NavController, tempLi
                         }
                     },
                     modifier = Modifier
-                        .padding(horizontal = 15.dp, vertical = 15.dp),
+                        .padding(horizontal = 20.dp, vertical = 15.dp),
                     fontSize = 14.sp
                 )
                 Text(
