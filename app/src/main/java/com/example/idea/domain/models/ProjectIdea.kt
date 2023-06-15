@@ -10,6 +10,7 @@ data class ProjectIdea(
     var stars : Int = 0,
     var description: String = "",
     var author: String = "",
+    var authorName : String = "",
     var dateCreated: Timestamp = Timestamp(0L, 0),
     var difficulty: SortBy = SortBy.DIFFICULTY_RANDOM,
     var likedByUserId: MutableList<String> = mutableListOf(),

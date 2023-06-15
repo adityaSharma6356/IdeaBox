@@ -47,12 +47,16 @@ class MainViewModel: ViewModel() {
         viewModelScope.launch {
             state = state.copy(mainList = data.loadAllProjects().toMutableList())
             state = state.copy(tempList = state.mainList)
-            sortSearchResults(SortBy.LATEST, SortBy.DIFFICULTY_RANDOM)
+            state.sortByPopularity()
+//            sortSearchResults(SortBy.LATEST, SortBy.DIFFICULTY_RANDOM)
         }
     }
 
     fun onEvent(event: UiEvents){
         when(event){
+            is UiEvents.EditIdea -> {
+                editIdea(event.data)
+            }
             is UiEvents.SetMyIdeaView -> {
                 state = state.copy(setView = 0)
                 state.setView()
@@ -84,6 +88,11 @@ class MainViewModel: ViewModel() {
             }
             else -> Unit
         }
+    }
+
+    private fun editIdea(project: ProjectIdea){
+        likeClick(project)
+        showBarWithMessage("Idea Updated")
     }
     private fun deleteIdea(project: ProjectIdea){
         viewModelScope.launch {
@@ -176,6 +185,9 @@ class MainViewModel: ViewModel() {
             googleAuthUIClient.signOut()
             state = state.copy(user = User())
             showProfileSection = false
+            if(state.user.id.isBlank()){
+                showBarWithMessage("Signed out successfully")
+            }
         }
     }
 }

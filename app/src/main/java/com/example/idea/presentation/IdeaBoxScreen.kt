@@ -38,7 +38,11 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
-fun IdeaBoxScreen(mainViewModel: MainViewModel, navController: NavHostController) {
+fun IdeaBoxScreen(
+    mainViewModel: MainViewModel,
+    navController: NavHostController,
+    addProjectViewModel: AddProjectViewModel
+) {
     Column(modifier = Modifier
         .fillMaxSize()
         .pointerInput(Unit) {
@@ -47,7 +51,10 @@ fun IdeaBoxScreen(mainViewModel: MainViewModel, navController: NavHostController
         BackHandler(!mainViewModel.active && !mainViewModel.openFilter && (mainViewModel.state.currentSortBy != SortBy.LATEST || mainViewModel.state.currentDifficulty != SortBy.DIFFICULTY_RANDOM)) {
             mainViewModel.state.currentSortBy = SortBy.LATEST
             mainViewModel.state.currentDifficulty = SortBy.DIFFICULTY_RANDOM
-            mainViewModel.sortSearchResults(mainViewModel.state.currentSortBy, mainViewModel.state.currentDifficulty)
+            mainViewModel.sortSearchResults(
+                mainViewModel.state.currentSortBy,
+                mainViewModel.state.currentDifficulty
+            )
         }
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -234,7 +241,12 @@ fun IdeaBoxScreen(mainViewModel: MainViewModel, navController: NavHostController
         val refreshState = rememberSwipeRefreshState(isRefreshing = mainViewModel.isRefreshing)
         SwipeRefresh(state = refreshState, onRefresh = { mainViewModel.refresh() }, modifier = Modifier.fillMaxSize()) {
             AnimatedVisibility(visible = mainViewModel.isFilterChanging, enter = fadeIn(animationSpec = TweenSpec(100)), exit = fadeOut(animationSpec = TweenSpec(100))) {
-                IdeasList(mainViewModel = mainViewModel, navController = navController, mainViewModel.state.tempList)
+                IdeasList(
+                    mainViewModel = mainViewModel,
+                    navController = navController,
+                    tempList = mainViewModel.state.tempList,
+                    addProjectViewModel
+                )
             }
         }
     }

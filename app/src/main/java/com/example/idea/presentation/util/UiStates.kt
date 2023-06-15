@@ -28,7 +28,8 @@ data class UiStates(
     var showErrorCard: Boolean = false,
     var draftSaved :Boolean = false,
     var currentQuery : String = "",
-    var setView: Int = 0
+    var setView: Int = 0,
+    var floatText: String = "  Drop  "
 ){
     fun setView(){
         secondList = if(setView==1){
@@ -51,9 +52,9 @@ data class UiStates(
             mainList.filter { it.difficulty==currentDifficulty }.toMutableList()
         }
         if(currentSortBy==SortBy.POPULAR) {
-            tempList.sortedByDescending { it.stars }
+            tempList.sortByDescending { it.bookMarkedByUsers.size }
         } else {
-            tempList.sortBy { it.dateCreated }
+            tempList.sortByDescending { it.dateCreated }
         }
     }
 }

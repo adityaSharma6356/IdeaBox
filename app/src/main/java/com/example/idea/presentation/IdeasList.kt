@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -30,6 +31,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -39,8 +42,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -60,9 +68,14 @@ import com.example.idea.presentation.util.UiEvents
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IdeasList(mainViewModel: MainViewModel, navController: NavController, tempList: MutableList<ProjectIdea>){
+fun IdeasList(
+    mainViewModel: MainViewModel,
+    navController: NavController,
+    tempList: MutableList<ProjectIdea>,
+    addProjectViewModel: AddProjectViewModel
+){
     LazyColumn(
-        Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         contentPadding = PaddingValues(bottom = 100.dp)
     ){
@@ -107,6 +120,7 @@ fun IdeasList(mainViewModel: MainViewModel, navController: NavController, tempLi
                 modifier = Modifier
                     .padding(vertical = 10.dp)
                     .clickable {
+                        mainViewModel.state.highlightProject = tempList[index]
                         navController.navigate(Screen.SingleIdea.route) {
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
@@ -162,7 +176,7 @@ fun IdeasList(mainViewModel: MainViewModel, navController: NavController, tempLi
                 }
                 val tempOP = MaterialTheme.colorScheme.secondary
                 val tempColor by remember {
-                    mutableStateOf(colorProvider(tempList[index].difficulty, tempOP))
+                    mutableStateOf(colorProvider(tempList[index].difficulty))
                 }
                 Row(modifier = Modifier
                     .padding(end = 10.dp)
@@ -184,17 +198,34 @@ fun IdeasList(mainViewModel: MainViewModel, navController: NavController, tempLi
                     Spacer(modifier = Modifier.weight(1f))
                     var contains by remember { mutableStateOf(tempList[index].bookMarkedByUsers.contains(mainViewModel.state.user.id)) }
                     if(tempList[index].author==mainViewModel.state.user.id){
-                        IconButton(
-                            colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.surface),
-                            onClick = { /*TODO*/ },
+                        Box(
                             modifier = Modifier
+                                .padding(start = 5.dp)
+                                .clickable {
+                                    mainViewModel.state.floatText = " Update "
+                                    mainViewModel.state.highlightProject = tempList[index]
+                                    addProjectViewModel.editEnabled = true
+                                    addProjectViewModel.setEditData(tempList[index])
+                                    navController.navigate(Screen.AddProject.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                }
                                 .shadow(
                                     10.dp,
                                     spotColor = MaterialTheme.colorScheme.onSurface,
-                                    shape = RoundedCornerShape(50)
+                                    ambientColor = MaterialTheme.colorScheme.onSurface,
+                                    shape = RoundedCornerShape(5.dp),
+                                    clip = false
                                 )
-                                .align(Alignment.CenterVertically)
-                        ) {
+                                .clip(RoundedCornerShape(10.dp))
+                                .size(38.dp)
+                                .background(MaterialTheme.colorScheme.surface)
+                                .align(Alignment.CenterVertically),
+                            contentAlignment = Alignment.Center) {
                             Icon(
                                 painter = painterResource(id = R.drawable.edit_icon),
                                 contentDescription = null,
@@ -202,17 +233,25 @@ fun IdeasList(mainViewModel: MainViewModel, navController: NavController, tempLi
                                 modifier = Modifier.size(20.dp)
                             )
                         }
-                        IconButton(
-                            colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.surface),
-                            onClick = { showAlert = true },
+
+                        Box(
                             modifier = Modifier
-                                .shadow(
-                                    10.dp,
-                                    spotColor = MaterialTheme.colorScheme.onSurface,
-                                    shape = RoundedCornerShape(50)
-                                )
-                                .align(Alignment.CenterVertically)
-                        ) {
+                                .padding(start = 5.dp)
+                                .clickable {
+                                    showAlert = true
+                                }
+                            .shadow(
+                                10.dp,
+                                spotColor = MaterialTheme.colorScheme.onSurface,
+                                ambientColor = MaterialTheme.colorScheme.onSurface,
+                                shape = RoundedCornerShape(5.dp),
+                                clip = false
+                            )
+                            .clip(RoundedCornerShape(10.dp))
+                            .size(38.dp)
+                            .background(MaterialTheme.colorScheme.surface)
+                            .align(Alignment.CenterVertically),
+                            contentAlignment = Alignment.Center) {
                             Icon(
                                 painter = painterResource(id = R.drawable.delete_icon),
                                 contentDescription = null,
@@ -221,32 +260,38 @@ fun IdeasList(mainViewModel: MainViewModel, navController: NavController, tempLi
                             )
                         }
                     }
-                    IconButton(
-                        colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.surface),
-                        onClick = {
-                            if(mainViewModel.state.user.id.isNotBlank()){
-                                contains = if(contains){
-                                    tempList[index].bookMarkedByUsers.remove(mainViewModel.state.user.id)
-                                    mainViewModel.onEvent(UiEvents.Bookmark(tempList[index]))
-                                    mainViewModel.onEvent(UiEvents.ShowBar("Bookmark Removed"))
-                                    false
-                                } else {
-                                    tempList[index].bookMarkedByUsers.add(mainViewModel.state.user.id)
-                                    mainViewModel.onEvent(UiEvents.Bookmark(tempList[index]))
-                                    mainViewModel.onEvent(UiEvents.ShowBar("Bookmark Added"))
-                                    true
-                                }
-                            } else {
-                                mainViewModel.onEvent(UiEvents.ShowBar("Login required"))
-                            }
-                        },
+                    Box(
                         modifier = Modifier
+                            .padding(start = 5.dp)
+                            .clickable {
+                                if(mainViewModel.state.user.id.isNotBlank()){
+                                    contains = if(contains){
+                                        tempList[index].bookMarkedByUsers.remove(mainViewModel.state.user.id)
+                                        mainViewModel.onEvent(UiEvents.Bookmark(tempList[index]))
+                                        mainViewModel.onEvent(UiEvents.ShowBar("Bookmark Removed"))
+                                        false
+                                    } else {
+                                        tempList[index].bookMarkedByUsers.add(mainViewModel.state.user.id)
+                                        mainViewModel.onEvent(UiEvents.Bookmark(tempList[index]))
+                                        mainViewModel.onEvent(UiEvents.ShowBar("Bookmark Added"))
+                                        true
+                                    }
+                                } else {
+                                    mainViewModel.onEvent(UiEvents.ShowBar("Login required"))
+                                }
+                            }
                             .shadow(
                                 10.dp,
                                 spotColor = if (contains) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                                shape = RoundedCornerShape(50)
+                                ambientColor = if (contains) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                shape = RoundedCornerShape(5.dp),
+                                clip = false
                             )
-                            .align(Alignment.CenterVertically)
+                            .clip(RoundedCornerShape(10.dp))
+                            .size(38.dp)
+                            .background(MaterialTheme.colorScheme.surface)
+                            .align(Alignment.CenterVertically),
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.bookmark_icon),
@@ -254,7 +299,17 @@ fun IdeasList(mainViewModel: MainViewModel, navController: NavController, tempLi
                             tint = if(contains) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(20.dp)
                         )
+//                        IconButton(
+//                            modifier = Modifier.clip(RoundedCornerShape(5.dp)),
+//                            colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.surface),
+//                            onClick = {
+
+//                            },
+//                        ) {
+//
+//                        }
                     }
+
                 }
                 val tempCatList = tempList[index].categories
                 LazyRow(modifier = Modifier

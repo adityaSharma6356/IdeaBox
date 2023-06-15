@@ -44,6 +44,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.idea.R
 import com.example.idea.presentation.google.GoogleAuthUIClient
 import com.example.idea.presentation.util.Screen
+import com.example.idea.presentation.util.SortBy
 import com.example.idea.presentation.util.UiEvents
 
 
@@ -111,10 +112,10 @@ fun MainScreen(
             }
             NavHost(navController = navController, startDestination = Screen.Idea.route){
                 composable(Screen.Idea.route){
-                    IdeaBoxScreen(mainViewModel, navController)
+                    IdeaBoxScreen(mainViewModel, navController, addProjectViewModel)
                 }
                 composable(Screen.MyIdea.route){
-                    MyIdeasScreen(mainViewModel, navController)
+                    MyIdeasScreen(mainViewModel, navController, addProjectViewModel)
                 }
                 composable(Screen.Profile.route){
                     ProfileScreen(mainViewModel)
@@ -136,10 +137,12 @@ fun MainScreen(
                 end.linkTo(parent.end, margin = 10.dp)
             }) {
             if(!it){
+//                addProjectViewModel.editEnabled = false
                 IconButton(
                     colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.primary),
                     onClick = {
                         if(mainViewModel.state.user.name.isNotBlank()){
+                            addProjectViewModel.editEnabled = false
                             navController.navigate(Screen.AddProject.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
@@ -165,11 +168,23 @@ fun MainScreen(
                     }
                 }
             } else {
+                if(!addProjectViewModel.editEnabled){
+                    mainViewModel.state.floatText = "  Drop  "
+                    addProjectViewModel.name = ""
+                    addProjectViewModel.description = ""
+                    addProjectViewModel.categoriesFinal.clear()
+                    addProjectViewModel.difficulty = SortBy.DIFFICULTY_BEGINNER
+                }
                 IconButton(
                     colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.primary),
                     onClick = {
                         if(mainViewModel.state.user.name.isNotBlank()){
-                            addProjectViewModel.shareData(mainViewModel, navController)
+                            if(addProjectViewModel.editEnabled){
+                                addProjectViewModel.editData(mainViewModel, navController, mainViewModel.state.highlightProject)
+                                addProjectViewModel.editEnabled = false
+                            } else {
+                                addProjectViewModel.shareData(mainViewModel, navController)
+                            }
                         } else {
                             mainViewModel.onEvent(UiEvents.ShowBar("Login Required"))
                         }
@@ -188,7 +203,7 @@ fun MainScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(modifier = Modifier.size(30.dp),painter = painterResource(id = R.drawable.box_dark), contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
-                        Text(text = "  Drop  ", maxLines = 2, fontSize = 15.sp, color = MaterialTheme.colorScheme.onPrimary)
+                        Text(text = mainViewModel.state.floatText, maxLines = 2, fontSize = 15.sp, color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             }

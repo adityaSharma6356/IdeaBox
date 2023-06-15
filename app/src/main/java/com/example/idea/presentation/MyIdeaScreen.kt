@@ -25,7 +25,11 @@ import com.example.idea.presentation.util.UiEvents
 
 
 @Composable
-fun MyIdeasScreen(mainViewModel: MainViewModel, navController: NavController) {
+fun MyIdeasScreen(
+    mainViewModel: MainViewModel,
+    navController: NavController,
+    addProjectViewModel: AddProjectViewModel
+) {
     Column(modifier = Modifier.fillMaxSize()) {
         Row(modifier = Modifier
             .padding(end = 10.dp, top = 10.dp)
@@ -70,6 +74,11 @@ fun MyIdeasScreen(mainViewModel: MainViewModel, navController: NavController) {
                 )
             }
         }
-        IdeasList(mainViewModel = mainViewModel, navController = navController, mainViewModel.state.secondList)
+        IdeasList(
+            mainViewModel = mainViewModel,
+            navController = navController,
+            tempList = mainViewModel.state.secondList,
+            addProjectViewModel
+        )
     }
 }

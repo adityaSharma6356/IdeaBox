@@ -32,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -42,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.Start
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -111,7 +113,7 @@ fun AddProjectScreen(mainViewModel: MainViewModel, navController: NavHostControl
                     Icon(
                         painter = painterResource(id = R.drawable.idea),
                         contentDescription = null,
-                        modifier = Modifier.size(30.dp),
+                        modifier = Modifier.size(20.dp),
                         tint = if(addProjectViewModel.name.isBlank()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary
                     )
                 },
@@ -152,8 +154,7 @@ fun AddProjectScreen(mainViewModel: MainViewModel, navController: NavHostControl
                                 contentDescription = null,
                                 modifier = Modifier
                                     .clickable {
-                                        categoriesList[addProjectViewModel.categoriesFinal[index].selectorIndex].selected =
-                                            false
+                                        categoriesList[addProjectViewModel.categoriesFinal[index].selectorIndex].selected = false
                                         addProjectViewModel.categoriesFinal.removeAt(index)
                                     }
                                     .padding(end = 5.dp)
@@ -216,6 +217,16 @@ fun AddProjectScreen(mainViewModel: MainViewModel, navController: NavHostControl
                     .fillMaxWidth(0.9f),
                 label = { Text(text = "Tell us what your Idea is about", fontSize = 12.sp)}
             )
+            TextButton(
+                modifier = Modifier.padding(top = 30.dp, start = 10.dp).align(Start),
+                onClick = {
+                addProjectViewModel.name = ""
+                addProjectViewModel.description = ""
+                addProjectViewModel.categoriesFinal.clear()
+                addProjectViewModel.difficulty = SortBy.DIFFICULTY_BEGINNER
+            }) {
+                Text(text = "Clear")
+            }
             if(addProjectViewModel.alertOpen){
                 AlertDialog(
                     properties = DialogProperties(usePlatformDefaultWidth = true),

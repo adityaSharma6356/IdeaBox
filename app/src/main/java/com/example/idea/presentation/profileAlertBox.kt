@@ -26,6 +26,11 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.TopCenter
@@ -47,6 +52,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.idea.R
 import com.example.idea.presentation.google.GoogleAuthUIClient
+import com.example.idea.presentation.util.UiEvents
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,158 +62,191 @@ fun ProfileAlertBox(
     googleAuthUIClient: GoogleAuthUIClient
 ) {
     val config = LocalConfiguration.current
-    AlertDialog(onDismissRequest = { mainViewModel.showProfileSection = false }, modifier = Modifier.width(config.screenWidthDp.dp)) {
-        Card(
-            shape = RoundedCornerShape(30.dp),
-            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)),
-            modifier = Modifier
-                .height(500.dp)
-                .fillMaxWidth()) {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .height(60.dp)) {
-                Icon(painter = painterResource(id = R.drawable.clear_icon), contentDescription = "", modifier = Modifier
-                    .padding(start = 15.dp, top = 15.dp)
-                    .size(25.dp)
-                    .align(TopStart)
-                    .clickable { mainViewModel.showProfileSection = false }
-                )
-                Text(text = "ideaBox", fontSize = 20.sp, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier
-                    .padding(top = 10.dp)
-                    .align(TopCenter)
-                )
+    var signOut by remember { mutableStateOf(false) }
+    if(signOut){
+        AlertDialog(onDismissRequest = { signOut = false }) {
+            Card(modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .height(200.dp)){
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .clickable {
+                            mainViewModel.logout(googleAuthUIClient)
+                            signOut = false
+                        }
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .background(MaterialTheme.colorScheme.primary)) {
+                    Text(text = "Confirm Sign-Out", fontSize = 20.sp, color = MaterialTheme.colorScheme.onPrimary)
+                }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .clickable {
+                            signOut = false
+                        }
+                        .fillMaxWidth()
+                        .height(150.dp)
+                        .background(MaterialTheme.colorScheme.surface)) {
+                    Text(text = "Cancel", fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurface)
+                }
             }
+        }
+    }else {
+        AlertDialog(onDismissRequest = { mainViewModel.showProfileSection = false }, modifier = Modifier.width(config.screenWidthDp.dp)) {
             Card(
                 shape = RoundedCornerShape(30.dp),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)),
                 modifier = Modifier
-                    .padding(bottom = 5.dp)
-                    .fillMaxWidth(0.95f)
-                    .height(350.dp)
-                    .align(CenterHorizontally), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
-                Row(
+                    .height(500.dp)
+                    .fillMaxWidth()) {
+                Box(
                     Modifier
-                        .padding(top = 15.dp)
                         .fillMaxWidth()
-                        .height(50.dp),
-                    verticalAlignment = CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    if (mainViewModel.state.user.profile != "") {
-                        AsyncImage(
-                            model = ImageRequest
-                                .Builder(LocalContext.current)
-                                .data(mainViewModel.state.user.profile)
-                                .build(),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(start = 15.dp, end = 10.dp)
-                                .size(40.dp)
-                                .clip(CircleShape)
-                        )
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                        ) {
-                            Text(
-                                text = mainViewModel.state.user.name,
-                                fontSize = 15.sp,
-                                maxLines = 1,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(top = 5.dp)
+                        .height(60.dp)) {
+                    Icon(painter = painterResource(id = R.drawable.clear_icon), contentDescription = "", modifier = Modifier
+                        .padding(start = 15.dp, top = 15.dp)
+                        .size(25.dp)
+                        .align(TopStart)
+                        .clickable { mainViewModel.showProfileSection = false }
+                    )
+                    Text(text = "ideaBox", fontSize = 20.sp, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier
+                        .padding(top = 10.dp)
+                        .align(TopCenter)
+                    )
+                }
+                Card(
+                    shape = RoundedCornerShape(30.dp),
+                    modifier = Modifier
+                        .padding(bottom = 5.dp)
+                        .fillMaxWidth(0.95f)
+                        .height(350.dp)
+                        .align(CenterHorizontally), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+                    Row(
+                        Modifier
+                            .padding(top = 15.dp)
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        verticalAlignment = CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        if (mainViewModel.state.user.profile != "") {
+                            AsyncImage(
+                                model = ImageRequest
+                                    .Builder(LocalContext.current)
+                                    .data(mainViewModel.state.user.profile)
+                                    .build(),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .padding(start = 15.dp, end = 10.dp)
+                                    .size(40.dp)
+                                    .clip(CircleShape)
                             )
-                            Text(
-                                text = mainViewModel.state.user.email,
-                                maxLines = 1,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Thin,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
+                            Column(
+                                Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight()
+                            ) {
+                                Text(
+                                    text = mainViewModel.state.user.name,
+                                    fontSize = 15.sp,
+                                    maxLines = 1,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.padding(top = 5.dp)
+                                )
+                                Text(
+                                    text = mainViewModel.state.user.email,
+                                    maxLines = 1,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Thin,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                            }
                         }
                     }
-                }
-                if (mainViewModel.state.user.id == "") {
-                    Spacer(modifier = Modifier.height(50.dp))
-                    Text(
-                        text = "Login or Register",
-                        fontSize = 15.sp,
-                        fontFamily = FontFamily.Monospace,
-                        fontStyle = FontStyle.Italic,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .align(CenterHorizontally)
-                            .clickable {
-                                navController.navigate("login")
-                            }
-                    )
-                } else {
-                    Spacer(modifier = Modifier.height(20.dp))
-                    OutlinedCard(
-                        Modifier
-                            .clickable {
-                                mainViewModel.logout(googleAuthUIClient )
-                            }
-                            .height(IntrinsicSize.Min)
-                            .align(CenterHorizontally)
-                    ) {
+                    if (mainViewModel.state.user.id == "") {
+                        Spacer(modifier = Modifier.height(50.dp))
                         Text(
-                            text = "     Sign Out     ",
-                            fontSize = 17.sp,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(vertical = 5.dp).weight(1f)
+                            text = "Login or Register",
+                            fontSize = 15.sp,
+                            fontFamily = FontFamily.Monospace,
+                            fontStyle = FontStyle.Italic,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .align(CenterHorizontally)
+                                .clickable {
+                                    navController.navigate("login")
+                                }
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.height(20.dp))
+                        OutlinedCard(
+                            Modifier
+                                .clickable {
+                                    signOut = true
+                                }
+                                .height(IntrinsicSize.Min)
+                                .align(CenterHorizontally)
+                        ) {
+                            Text(
+                                text = "     Sign Out     ",
+                                fontSize = 17.sp,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.padding(vertical = 5.dp).weight(1f)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(15.dp))
+                        Spacer(
+                            modifier = Modifier.height(2.dp).fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp))
                         )
                     }
-                    Spacer(modifier = Modifier.height(15.dp))
-                    Spacer(
-                        modifier = Modifier.height(2.dp).fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp))
-                    )
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 18.dp, top = 110.dp)
+                            .fillMaxWidth()
+                            .height(40.dp), verticalAlignment = CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.settings_icon),
+                            modifier = Modifier.size(25.dp),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "  Test Placeholder",
+                            fontSize = 15.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 18.dp, top = 10.dp)
+                            .fillMaxWidth()
+                            .height(40.dp), verticalAlignment = CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.settings_icon),
+                            modifier = Modifier.size(25.dp),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "  Profile Settings",
+                            fontSize = 15.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
-                Row(
-                    modifier = Modifier
-                        .padding(start = 18.dp, top = 110.dp)
-                        .fillMaxWidth()
-                        .height(40.dp), verticalAlignment = CenterVertically
+                Row(modifier = Modifier
+                    .padding(start = 27.dp)
+                    .fillMaxWidth()
+                    .height(40.dp), verticalAlignment = CenterVertically
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.settings_icon),
-                        modifier = Modifier.size(25.dp),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        text = "  Test Placeholder",
-                        fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    Icon(painter = painterResource(id = R.drawable.settings_icon), modifier = Modifier.size(25.dp), contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
+                    Text(text = "  Settings", fontSize = 15.sp ,color = MaterialTheme.colorScheme.onSurface )
                 }
-                Row(
-                    modifier = Modifier
-                        .padding(start = 18.dp, top = 10.dp)
-                        .fillMaxWidth()
-                        .height(40.dp), verticalAlignment = CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.settings_icon),
-                        modifier = Modifier.size(25.dp),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        text = "  Profile Settings",
-                        fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
-            Row(modifier = Modifier
-                .padding(start = 27.dp)
-                .fillMaxWidth()
-                .height(40.dp), verticalAlignment = CenterVertically
-            ) {
-                Icon(painter = painterResource(id = R.drawable.settings_icon), modifier = Modifier.size(25.dp), contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
-                Text(text = "  Settings", fontSize = 15.sp ,color = MaterialTheme.colorScheme.onSurface )
             }
         }
     }

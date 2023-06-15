@@ -24,10 +24,10 @@ fun toName(it: SortBy): String {
 }
 
 
-fun colorProvider(it: SortBy, secondary: Color): Color {
+fun colorProvider(it: SortBy): Color {
     when(it){
         SortBy.DIFFICULTY_RANDOM -> {
-            return secondary
+            return Color.White
         }
         SortBy.DIFFICULTY_BEGINNER -> {
             return Color(72, 155, 56, 255)
