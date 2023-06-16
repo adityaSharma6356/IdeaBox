@@ -11,6 +11,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.idea.domain.models.Domains
 import com.example.idea.domain.models.ProjectIdea
+import com.example.idea.presentation.util.MultiSelect
 import com.example.idea.presentation.util.Screen
 import com.example.idea.presentation.util.SortBy
 import com.example.idea.presentation.util.UiEvents
@@ -31,6 +32,8 @@ class AddProjectViewModel: ViewModel() {
     var difficulty by mutableStateOf(SortBy.DIFFICULTY_BEGINNER)
     var menuExpanded by mutableStateOf(false)
     var editEnabled by mutableStateOf(false)
+
+    var cp = categoriesList.map { MultiSelect(it, false) }.toMutableStateList()
 
     fun setEditData(projectIdea: ProjectIdea){
         name = projectIdea.name

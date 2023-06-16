@@ -24,6 +24,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -43,6 +44,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.idea.R
 import com.example.idea.presentation.google.GoogleAuthUIClient
+import com.example.idea.presentation.util.MultiSelect
 import com.example.idea.presentation.util.Screen
 import com.example.idea.presentation.util.SortBy
 import com.example.idea.presentation.util.UiEvents
@@ -174,6 +176,8 @@ fun MainScreen(
                     addProjectViewModel.description = ""
                     addProjectViewModel.categoriesFinal.clear()
                     addProjectViewModel.difficulty = SortBy.DIFFICULTY_BEGINNER
+                    addProjectViewModel.cp.clear()
+                    addProjectViewModel.cp =  addProjectViewModel.categoriesList.map { MultiSelect(it, false) }.toMutableStateList()
                 }
                 IconButton(
                     colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.primary),

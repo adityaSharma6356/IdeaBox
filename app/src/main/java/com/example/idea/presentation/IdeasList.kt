@@ -5,6 +5,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
@@ -240,17 +243,17 @@ fun IdeasList(
                                 .clickable {
                                     showAlert = true
                                 }
-                            .shadow(
-                                10.dp,
-                                spotColor = MaterialTheme.colorScheme.onSurface,
-                                ambientColor = MaterialTheme.colorScheme.onSurface,
-                                shape = RoundedCornerShape(5.dp),
-                                clip = false
-                            )
-                            .clip(RoundedCornerShape(10.dp))
-                            .size(38.dp)
-                            .background(MaterialTheme.colorScheme.surface)
-                            .align(Alignment.CenterVertically),
+                                .shadow(
+                                    10.dp,
+                                    spotColor = MaterialTheme.colorScheme.onSurface,
+                                    ambientColor = MaterialTheme.colorScheme.onSurface,
+                                    shape = RoundedCornerShape(5.dp),
+                                    clip = false
+                                )
+                                .clip(RoundedCornerShape(10.dp))
+                                .size(38.dp)
+                                .background(MaterialTheme.colorScheme.surface)
+                                .align(Alignment.CenterVertically),
                             contentAlignment = Alignment.Center) {
                             Icon(
                                 painter = painterResource(id = R.drawable.delete_icon),
@@ -264,8 +267,8 @@ fun IdeasList(
                         modifier = Modifier
                             .padding(start = 5.dp)
                             .clickable {
-                                if(mainViewModel.state.user.id.isNotBlank()){
-                                    contains = if(contains){
+                                if (mainViewModel.state.user.id.isNotBlank()) {
+                                    contains = if (contains) {
                                         tempList[index].bookMarkedByUsers.remove(mainViewModel.state.user.id)
                                         mainViewModel.onEvent(UiEvents.Bookmark(tempList[index]))
                                         mainViewModel.onEvent(UiEvents.ShowBar("Bookmark Removed"))
@@ -299,44 +302,24 @@ fun IdeasList(
                             tint = if(contains) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(20.dp)
                         )
-//                        IconButton(
-//                            modifier = Modifier.clip(RoundedCornerShape(5.dp)),
-//                            colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.surface),
-//                            onClick = {
-
-//                            },
-//                        ) {
-//
-//                        }
                     }
-
                 }
-                val tempCatList = tempList[index].categories
-                LazyRow(modifier = Modifier
-                    .padding(start = 7.dp, top = 20.dp, end = 15.dp)
-                    .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
-                ){
-                    itemsIndexed(tempCatList) { it, cate  ->
-                        Text(
-                            text = "  $cate  ",
-                            color = MaterialTheme.colorScheme.inverseSurface,
-                            modifier = Modifier
-                                .padding(horizontal = 5.dp)
-                                .background(
-                                    shape = RoundedCornerShape(5.dp),
-                                    color = MaterialTheme.colorScheme.surface
-                                ),
-                            fontSize = 12.sp
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(top = 20.dp, start = 15.dp, end = 15.dp)
+                        .clip(RoundedCornerShape(5.dp))
+                        .height(30.dp)
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(start = 5.dp, end = 5.dp)) {
+                    Text(
+                        text = mainViewModel.state.tempList[index].categories.joinToString(" | "),
+                        fontSize = 13.sp,
+                        maxLines = 1,
+                        color = MaterialTheme.colorScheme.onSurface,
                         )
-                        if(tempCatList.lastIndex>it){
-                            Spacer(
-                                modifier = Modifier
-                                    .height(15.dp)
-                                    .width((0.5).dp)
-                                    .background(MaterialTheme.colorScheme.onSurface)
-                            )
-                        }
-                    }
                 }
                 Text(
                     buildAnnotatedString {

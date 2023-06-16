@@ -77,7 +77,8 @@ data class Domains(
         "Self-improvement Apps",
         "Life Coaching",
         "Personal Finance Management",
-        "Healthy Habits Tracking"
+        "Healthy Habits Tracking",
+        "Education"
     )
 )
 

@@ -40,6 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -77,16 +78,16 @@ fun AddProjectScreen(mainViewModel: MainViewModel, navController: NavHostControl
                 .navigationBarsWithImePadding(),
             horizontalAlignment = CenterHorizontally
         ) {
-            var categoriesList by remember {
-                mutableStateOf(
-                    addProjectViewModel.categoriesList.map {
-                        MultiSelect(
-                            name = it,
-                            selected = false
-                        )
-                    }
-                )
-            }
+//            var categoriesList by remember {
+//                mutableStateOf(
+//                    addProjectViewModel.categoriesList.map {
+//                        MultiSelect(
+//                            name = it,
+//                            selected = false
+//                        )
+//                    }
+//                )
+//            }
             Text(
                 text = "Drop your Idea",
                 fontSize = 20.sp,
@@ -125,6 +126,16 @@ fun AddProjectScreen(mainViewModel: MainViewModel, navController: NavHostControl
                 .heightIn(min = 50.dp, max = 200.dp)
                 .fillMaxWidth(0.9f)
                 .clickable {
+                    val temp = addProjectViewModel.cp.toList()
+                    temp.forEach {
+                        addProjectViewModel.categoriesFinal.forEach { item ->
+                            if (it.name==item.name){
+                                it.selected = true
+                            }
+                        }
+                    }
+                    addProjectViewModel.cp.clear()
+                    addProjectViewModel.cp.addAll(temp)
                     addProjectViewModel.alertOpen = true
                 }
                 .border(
@@ -154,7 +165,7 @@ fun AddProjectScreen(mainViewModel: MainViewModel, navController: NavHostControl
                                 contentDescription = null,
                                 modifier = Modifier
                                     .clickable {
-                                        categoriesList[addProjectViewModel.categoriesFinal[index].selectorIndex].selected = false
+                                        addProjectViewModel.cp[addProjectViewModel.categoriesFinal[index].selectorIndex].selected = false
                                         addProjectViewModel.categoriesFinal.removeAt(index)
                                     }
                                     .padding(end = 5.dp)
@@ -220,10 +231,12 @@ fun AddProjectScreen(mainViewModel: MainViewModel, navController: NavHostControl
             TextButton(
                 modifier = Modifier.padding(top = 30.dp, start = 10.dp).align(Start),
                 onClick = {
-                addProjectViewModel.name = ""
-                addProjectViewModel.description = ""
-                addProjectViewModel.categoriesFinal.clear()
-                addProjectViewModel.difficulty = SortBy.DIFFICULTY_BEGINNER
+                    addProjectViewModel.name = ""
+                    addProjectViewModel.description = ""
+                    addProjectViewModel.categoriesFinal.clear()
+                    addProjectViewModel.difficulty = SortBy.DIFFICULTY_BEGINNER
+                    addProjectViewModel.cp.clear()
+                    addProjectViewModel.cp =  addProjectViewModel.categoriesList.map { MultiSelect(it, false) }.toMutableStateList()
             }) {
                 Text(text = "Clear")
             }
@@ -232,25 +245,30 @@ fun AddProjectScreen(mainViewModel: MainViewModel, navController: NavHostControl
                     properties = DialogProperties(usePlatformDefaultWidth = true),
                     modifier = Modifier
                         .height(600.dp)
-                    ,onDismissRequest = { addProjectViewModel.alertOpen = false }
+                    ,onDismissRequest = {
+                        addProjectViewModel.alertOpen = false
+                        addProjectViewModel.cp.clear()
+                        addProjectViewModel.cp =  addProjectViewModel.categoriesList.map { MultiSelect(it, false) }.toMutableStateList()
+                    }
                 ) {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(categoriesList.size){ index ->
+                        items(addProjectViewModel.cp.size, key = {addProjectViewModel.cp[it].name}){ index ->
                             Row(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(50.dp)) {
-                                Text(text = categoriesList[index].name, fontSize = 15.sp , maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                                Checkbox(checked = categoriesList[index].selected, onCheckedChange = {
-                                    if(it){
-                                        addProjectViewModel.categoriesFinal.add(addProjectViewModel.CateBoxState(categoriesList[index].name, index))
+                                Text(text = addProjectViewModel.cp[index].name, fontSize = 15.sp , maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                                Checkbox(checked = addProjectViewModel.cp[index].selected, onCheckedChange = {
+                                    if(!addProjectViewModel.cp[index].selected){
+                                        addProjectViewModel.cp[index] = addProjectViewModel.cp[index].copy(selected = true)
+                                        addProjectViewModel.categoriesFinal.add(addProjectViewModel.CateBoxState(addProjectViewModel.cp[index].name, index))
                                     } else {
-                                        addProjectViewModel.categoriesFinal.remove(addProjectViewModel.CateBoxState(categoriesList[index].name, index))
+                                        addProjectViewModel.cp[index] = addProjectViewModel.cp[index].copy(selected = false)
+                                        addProjectViewModel.categoriesFinal.removeIf { it.name == addProjectViewModel.cp[index].name }
                                     }
-                                    categoriesList[index].selected = it
-                                }, modifier = Modifier)
+                                })
                             }
                         }
                     }
