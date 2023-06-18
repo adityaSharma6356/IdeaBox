@@ -12,4 +12,4 @@
 - Google Login
 - Material 3 theming 
 - Firebase Database
-- MVVM Clean Architecture
+- MVI Clean Architecture
