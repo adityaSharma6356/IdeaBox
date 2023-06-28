@@ -5,7 +5,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,24 +17,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Shapes
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -46,12 +37,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -66,6 +53,7 @@ import com.example.idea.R
 import com.example.idea.domain.models.ProjectIdea
 import com.example.idea.presentation.mappers.colorProvider
 import com.example.idea.presentation.mappers.toName
+import com.example.idea.presentation.util.ADMIN_ID
 import com.example.idea.presentation.util.Screen
 import com.example.idea.presentation.util.UiEvents
 
@@ -143,39 +131,6 @@ fun IdeasList(
                             .padding(15.dp, 10.dp, 0.dp, 0.dp)
                             .align(Alignment.CenterVertically)
                     )
-//                    IconButton(onClick = {
-//                        if(!mainViewModel.state.tempList[index].likedByUserId.contains(mainViewModel.state.user.id)){
-//                            val tempdata = mainViewModel.state.tempList[index]
-//                            tempdata.likedByUserId.add(mainViewModel.state.user.id)
-//                            mainViewModel.onEvent(UiEvents.LikeProject(tempdata, context))
-//                        } else {
-//                            val tempdata = mainViewModel.state.tempList[index]
-//                            tempdata.likedByUserId.remove(mainViewModel.state.user.id)
-//                            mainViewModel.onEvent(UiEvents.LikeProject(tempdata, context))
-//                        }
-//                    }, modifier = Modifier
-//                        .padding(top = 5.dp)
-//                        .size(70.dp, 40.dp)) {
-//                        Row(verticalAlignment = Alignment.CenterVertically) {
-//                            Text(
-//                                text = mainViewModel.state.tempList[index].likedByUserId.size.toString(),
-//                                color = Color.Yellow,
-//                                fontSize = 19.sp,
-//                            )
-//                            Icon(painter = painterResource(
-//                                id = if (mainViewModel.state.tempList[index].likedByUserId.contains(mainViewModel.state.user.id))
-//                                    R.drawable.starred_icon
-//                                else
-//                                    R.drawable.not_starred_icon
-//                            ),
-//                                contentDescription = null,
-//                                modifier = Modifier
-//                                    .padding(horizontal = 5.dp)
-//                                    .size(25.dp),
-//                                tint = Color.Yellow
-//                            )
-//                        }
-//                    }
                 }
                 val tempOP = MaterialTheme.colorScheme.secondary
                 val tempColor by remember {
@@ -200,7 +155,7 @@ fun IdeasList(
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     var contains by remember { mutableStateOf(tempList[index].bookMarkedByUsers.contains(mainViewModel.state.user.id)) }
-                    if(tempList[index].author==mainViewModel.state.user.id){
+                    if(tempList[index].author==mainViewModel.state.user.id || mainViewModel.state.user.id == ADMIN_ID){
                         Box(
                             modifier = Modifier
                                 .padding(start = 5.dp)
